@@ -221,7 +221,7 @@ Il faut que je change mon modèle, mais du coup je n'ai plus qu'une seule variab
 
 ```{r}
 rda_envspa <- rda(flo_hell ~ altitude + MEM1 + MEM2 + MEM6 + MEM4 + MEM3 + MEM5 + MEM12 + MEM9 + MEM7 +
-MEM31 + MEM10 + MEM17 + MEM16 + MEM28 , env_spa)
+MEM31 + MEM10 + MEM17 + MEM16 , env_spa)
 ```
 
 Les graphiques.
