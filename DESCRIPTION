@@ -9,4 +9,7 @@ Imports:
   adespatial,
   adegraphics,
   spdep,
-  vegan
+  vegan,
+  janitor,
+  rmarkdown,
+  rmdformats
