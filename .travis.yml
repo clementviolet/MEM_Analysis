@@ -1,0 +1,17 @@
+# R for travis: see documentation at https://docs.travis-ci.com/user/languages/r
+
+language: R
+r: 3.6.1
+cache:
+  packages: yes
+
+before_script:
+  - chmod +x ./_build.sh
+
+script:
+  - ./_build.sh
+
+deploy:
+  provider: pages
+  skip_cleanup: true
+  github_token: $GITHUB_TOKEN
