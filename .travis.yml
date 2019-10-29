@@ -7,6 +7,9 @@ cache:
 
 before_install:
   - sudo apt-get install -y libudunits2-dev # Package units ne peut s'installer sans.
+  # Installation nécessaire pour le package sf
+  - sudo apt-get install -y libgeos-dev
+  - sudo apt-get install -y libgdal-dev
 
 before_script:
   - chmod +x ./_build.sh
