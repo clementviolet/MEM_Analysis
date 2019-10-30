@@ -98,7 +98,7 @@ MC_env <- moran.randtest(mil, listwgab, nrepet = 999)
 plot(MC_env)
 ```
 
-Seul le sable ne présente pas d'autocorrélation spatiale. On va sélectionner quelles sont les MEM à conserver pour éviter le surapprentissage.
+Seul le sable ne présente pas d'autocorrélation spatiale. On va sélectionner quelles sont les MEM à conserver pour éviter le surapprentissage. Attention, seul les MEM ayant une autocorrelation positive sont détectés ici.
 
 ```{r mem-sel}
 pca_hell <- dudi.pca(flo_hell, scale = FALSE, scannf = FALSE, nf = 2)
@@ -126,46 +126,33 @@ On regarde si la RDA est significative
 anova.cca(rda_mem)
 ```
 
-Puis, la sélection des MEMs et on vérifie leur colinéarité.
-
-```{r}
-ordistep(rda_mem, perm.max = 499, direction = "backward")
-```
-
-Rien à changer de la formule du modèle.
-
-```{r}
-vif.cca(rda_mem)
-```
-
-Pas de colinéarité (mais c'est normal, ils sont tous orthogonaux, je suis trop con).
-
 Enfin, on va regarder les graphiques.
 
 ```{r message = FALSE}
-triplot.rda(rda_mem, site.sc = "wa", scaling = 1, label.sites = FALSE)
-triplot.rda(rda_mem, site.sc = "wa", label.sites = FALSE)
+triplot.rda(rda_mem, site.sc = "lc", scaling = 1, label.sites = FALSE)
+triplot.rda(rda_mem, site.sc = "lc", label.sites = FALSE)
 ```
 
-Les graphiques ne sont pas trop lisibles, j'utiliserai sûrement `goodness()` pour afficher que les espèces les mieux représentées...
+On va enlever les espèces les moins bien représentés dans nos ordinations. Le seuil fixé à  ` > 0.4` est arbitraire et dépend des résultats de `goodness(rda_mem)`.
+```{r message = FALSE}
+triplot.rda(rda_mem, site.sc = "lc", scaling = 1, label.sites = FALSE, select.spe = goodness(rda_mem, model = "CCA")[, 2] > 0.4)
+triplot.rda(rda_mem, site.sc = "lc", label.sites = FALSE, select.spe = goodness(rda_mem, model = "CCA")[, 2] > 0.4)
+```
 
 ## Partie environnemtale
 
-On fait la RDA avec les variables.
+On séléectionne les variable qui maximise le $R^2$.
 
 ```{r}
-rda_env <- rda(flo_hell~ ., mil_scl)
-```
+m0 <- rda(flo ~ 1, mil_scl)
+m1 <- rda(flo ~ ., mil_scl)
 
-Puis sélection de variables
-
-```{r}
-ordistep(rda_env, perm.max = 499, direction = "backward")
+ordiR2step(m0, m1)
 ```
- Ok, on va changer un peu la formule du modèle.
+Maintenant on va faire le modèle
  
 ```{r}
-rda_env <- rda(flo_hell ~ mg + k + capa_reten + altitude, mil_scl)
+rda_env <- rda(flo_hell ~ k + altitude + capa_reten, mil_scl)
 ```
 
 Test de notre modèle.
@@ -183,11 +170,16 @@ vif.cca(rda_env)
 Youpi ! Maintenant, les graphiques.
 
 ```{r message = FALSE}
-triplot.rda(rda_env, site.sc = "wa", scaling = 1, label.sites = FALSE)
-triplot.rda(rda_env, site.sc = "wa", label.sites = FALSE)
+triplot.rda(rda_env, site.sc = "lc", scaling = 1, label.sites = FALSE)
+triplot.rda(rda_env, site.sc = "lc", label.sites = FALSE)
 ```
 
-Bon toujours `goodness()` quoi...
+On va retirer de l'affichage quelques espèces.
+
+```{r message = FALSE}
+triplot.rda(rda_env, site.sc = "lc", scaling = 1, label.sites = FALSE, select.spe = goodness(rda_env, model = "CCA")[, 2] > 0.15)
+triplot.rda(rda_env, site.sc = "lc", label.sites = FALSE, select.spe = goodness(rda_env, model = "CCA")[, 2] > 0.15)
+```
 
 ## Mise en commun
 
@@ -195,7 +187,7 @@ On va joindre les deux tableaux (MEMs et variables environnementales utilisées)
 
 ```{r}
 env_spa <- mil_scl %>%
-  select(mg, k, capa_reten, altitude) %>%
+  select(k, capa_reten, altitude) %>%
   cbind(mem_gab_sel$MEM.select)
 ```
 
@@ -214,27 +206,14 @@ anova.cca(rda_envspa)
 
 
 ```{r message = FALSE}
-triplot.rda(rda_envspa, site.sc = "wa", scaling = 1, label.sites = FALSE, plot.centr = FALSE)
-triplot.rda(rda_envspa, site.sc = "wa", label.sites = FALSE, plot.centr = FALSE)
+triplot.rda(rda_envspa, site.sc = "lc", scaling = 1, label.sites = FALSE, plot.centr = FALSE)
+triplot.rda(rda_envspa, site.sc = "lc", label.sites = FALSE, plot.centr = FALSE)
 ```
 
-Sélection des variables.
-
-```{r}
-ordistep(rda_envspa, perm.max = 499, direction = "backward")
-```
-
-Il faut que je change mon modèle, mais du coup je n'ai plus qu'une seule variable environnementale ? Est-ce grave ?
-
-```{r}
-rda_envspa <- rda(flo_hell ~ altitude + MEM1 + MEM2 + MEM6 + MEM4 + MEM3 + MEM5 + MEM12 + MEM9 + MEM7 +
-MEM31 + MEM10 + MEM17 + MEM16 , env_spa)
-```
-
-Les graphiques.
+On va retirer de l'affichage quelques espèces.
 
 ```{r message = FALSE}
-triplot.rda(rda_envspa, site.sc = "wa", scaling = 1, label.sites = FALSE)
-triplot.rda(rda_envspa, site.sc = "wa", label.sites = FALSE)
-```
+triplot.rda(rda_envspa, site.sc = "lc", scaling = 1, label.sites = FALSE, select.spe = goodness(rda_envspa, model = "CCA")[, 2] > 0.3)
 
+triplot.rda(rda_envspa, site.sc = "lc", label.sites = FALSE, select.spe = goodness(rda_envspa, model = "CCA")[, 2] > 0.3)
+```
