@@ -1,12 +1,12 @@
-'triplot.rda' <- 
+'triplot.rda' <-
 	function(res.rda, ax1=1, ax2=2, site.sc="lc", scaling=2,
-             plot.sites=TRUE, plot.spe=TRUE, plot.env=TRUE, plot.centr=TRUE, 
-             arrows.only=FALSE, label.sites=TRUE, label.spe=TRUE, label.env=TRUE, 
-             label.centr=TRUE, cex.char1=0.7, cex.char2=1.0, cex.point=0.8, pos.sites=2, 
-             pos.spe=4, pos.env=4, pos.centr=4, mult.spe=1, mult.arrow=1, select.spe=NULL, 
+             plot.sites=TRUE, plot.spe=TRUE, plot.env=TRUE, plot.centr=TRUE,
+             arrows.only=FALSE, label.sites=TRUE, label.spe=TRUE, label.env=TRUE,
+             label.centr=TRUE, cex.char1=0.7, cex.char2=1.0, cex.point=0.8, pos.sites=2,
+             pos.spe=4, pos.env=4, pos.centr=4, mult.spe=1, mult.arrow=1, select.spe=NULL,
              mar.percent=0.15, optimum=TRUE, move.origin=c(0,0), silent=TRUE)
 #
-# A function to draw a triplot (scaling 1 or scaling 2) from an object 
+# A function to draw a triplot (scaling 1 or scaling 2) from an object
 # of class "rda" containing RDA result from vegan's rda() function.
 #
 # ARGUMENTS
@@ -14,7 +14,7 @@
 # ##### General parameters
 # res.rda          An rda{vegan} object.
 # ax1, ax2         Canonical axes to be drawn as abscissa and ordinate. Defaults: 1 and 2.
-# site.sc          Can be set to "lc" (linear constraints or model scores, default) 
+# site.sc          Can be set to "lc" (linear constraints or model scores, default)
 #                  or "wa" (weighted averages, default in vegan).
 # scaling          Scaling type: only 1 or 2 are supported. Default: 2.
 #
@@ -22,7 +22,7 @@
 # plot.sites       If TRUE, the sites will be plotted as small circles.
 # plot.spe         If TRUE, the species (or other response variables) will be plotted.
 # plot.env         If TRUE, arrows for the explanatory variables will be plotted.
-# plot.centr       If TRUE, symbols will be plotted at the centroids of factor levels. 
+# plot.centr       If TRUE, symbols will be plotted at the centroids of factor levels.
 # arrows.only      if TRUE, plot arrows for quant. explanatory var. and factor classes
 # label.sites      If TRUE, labels are added to the site symbols.
 # label.spe        If TRUE, labels are added to the species arrows.
@@ -34,30 +34,30 @@
 #
 # ##### Label positions
 # ## Positions: 1=below the point, 2=left, 3=above, 4=right. Default: 4.
-# ## Note - Argument pos=NULL centres the label on the position of the object (site point,  
+# ## Note - Argument pos=NULL centres the label on the position of the object (site point,
 # ## species or environmental variable arrow, centroid) when the object is not drawn.
 # pos.sites        Position of site labels. 1 to 4, as above. Default: 2.
 # pos.spe          Position of species labels. 1 to 4, as above. Default: 4.
 # pos.env          Position of env.variable labels. 1 to 4, as above. Default: 4.
-# pos.centr        Position of centroid labels. 1 to 4, as above. Default: 4. 
+# pos.centr        Position of centroid labels. 1 to 4, as above. Default: 4.
 #
 # ##### Multipliers, selection of species to be plotted
 # mult.spe         Multiplier for length of the species arrows. Default: 1.
 # mult.arrow       Multiplier for length of the environmental arrows. Default: 1.
-# select.spe       Vector containing a selection of the species numbers to be drawn in 
-#                  the biplot, e.g. c(1,2,5,8,12). Draw all species if select.spe=NULL 
-#                  (default value). The species that are well represented in the RDA plot 
+# select.spe       Vector containing a selection of the species numbers to be drawn in
+#                  the biplot, e.g. c(1,2,5,8,12). Draw all species if select.spe=NULL
+#                  (default value). The species that are well represented in the RDA plot
 #                  can be identified using goodness(RDA.output.object,display="species")
 #
 # ##### Position of the plot in frame, margins
-# mar.percent      Factor to expand plot size to accomodate all items and labels. Positive 
-#                  values increase the margins around the plot, negative values reduce 
+# mar.percent      Factor to expand plot size to accomodate all items and labels. Positive
+#                  values increase the margins around the plot, negative values reduce
 #                  them.
-# optimum          If TRUE, the longest species and environmental arrows are stretched to 
-#                  a length equal to the distance to the origin of the site farthest from 
-#                  the origin in the plot of (ax1,ax2). This is an optimal combined 
-#                  representation of the three elements. The lengths of the species and 
-#                  environmental arrows can be further modified using the arguments 
+# optimum          If TRUE, the longest species and environmental arrows are stretched to
+#                  a length equal to the distance to the origin of the site farthest from
+#                  the origin in the plot of (ax1,ax2). This is an optimal combined
+#                  representation of the three elements. The lengths of the species and
+#                  environmental arrows can be further modified using the arguments
 #                  mult.spe and mult.arrow.
 # move.origin      Move plot origin right-left and up-down. Default: move.origin=c(0,0).
 #                  Ex. move.origin=c(-1,0.5) moves origin by 1 unit left and 0.5 unit up.
@@ -67,14 +67,14 @@
 #
 # # Example 1 - Table 11.3 of Legendre & Legendre (2012, p. 644), first 6 species only
 #
-# Y.mat = matrix(c(1,0,0,11,11,9,9,7,7,5,0,0,1,4,5,6,7,8,9,10,0,0,0,0,17,0,13,0,10,0,0, 
+# Y.mat = matrix(c(1,0,0,11,11,9,9,7,7,5,0,0,1,4,5,6,7,8,9,10,0,0,0,0,17,0,13,0,10,0,0,
 # 0,0,0,7,0,10,0,13,0,0,0,0,8,0,6,0,4,0,2,0,0,0,1,0,2,0,3,0,4),10,6)
 # Depth = 1:10
 # Sub. = as.factor(c(rep(1,3),4,2,4,2,4,2,4))
 # env = cbind(data.frame(Depth),data.frame(Sub.))
-# 
+#
 # rda.out = rda(Y.mat~ .,env)
-# 
+#
 # # Scaling=1
 # par(mfrow=c(1,2))
 # triplot.rda(rda.out, scaling=1, mar.percent=0)
@@ -86,13 +86,13 @@
 # triplot.rda(rda.out, scaling=2, move.origin=c(0.4,-0.25), mar.percent=0.05,silent=FALSE)
 #
 # # Example 2 - Dune data
-# 
+#
 # library(vegan)
 # data(dune)
 # data(dune.env)
-# 
+#
 # rda.dune = rda(dune ~ .,dune.env)
-# 
+#
 # tmp = goodness(rda.dune)
 # ( sp.sel = which(tmp[,2] >= 0.4) )
 #
@@ -103,13 +103,13 @@
 #
 # #####
 #
-# License: GPL-2 
+# License: GPL-2
 # Authors: Francois Gillet, Daniel Borcard & Pierre Legendre, 2016
 # This version is dev4.4 (10 january 2017)
 {
 ### Internal functions
 #
-'stretch' <- 
+'stretch' <-
     function(sites, mat, ax1, ax2, n, silent=silent) {
   # Compute stretching factor for the species or environmental arrows
   # First, compute the longest distance to centroid for the sites
@@ -122,7 +122,7 @@
     tmp2 <- rbind(c(0,0), mat[,c(ax1,ax2)])
     D <- dist(tmp2)
     longest <- max(D[1:p])
-    } else { tmp2 <- rbind(c(0,0), mat[c(ax1,ax2)]) 
+    } else { tmp2 <- rbind(c(0,0), mat[c(ax1,ax2)])
     longest <- dist(tmp2)
     # print(tmp2)
     }  # If a single row left in 'mat'
@@ -131,7 +131,7 @@
   fact <- target/longest
 }
 #
-'larger.plot' <- 
+'larger.plot' <-
 	function(sit.sc, spe.sc, BP.sc, percent, move.origin, ax1, ax2) {
   # Internal function to expand plot limits (adapted from code by Pierre Legendre)
   mat <- rbind(sit.sc, spe.sc, BP.sc)
@@ -151,7 +151,7 @@
   if(scaling!=1 & scaling!=2) stop("Function only available for scaling = 1 or 2")
   if(site.sc=="lc") {
 cat("\n-----------------------------------------------------------------------")
-cat("\nSite constraints (lc) selected. To obtain site scores that are weighted") 
+cat("\nSite constraints (lc) selected. To obtain site scores that are weighted")
 cat("\nsums of species scores (default in vegan), argument site.sc must be set")
 cat("\nto wa.")
 cat("\n-----------------------------------------------------------------------\n")
@@ -189,7 +189,7 @@ BP.sc1 = BP.sc2 %*% Diag         # Biplot scores, scaling=1
 if(!is.null(res.rda$CCA$centroids)) {
   centroids.sc2 = res.rda$CCA$centroids*sqrt(n-1)  # Centroids, scaling=2
   centroids.sc1 = centroids.sc2 %*% Lambda^(0.5)   # Centroids, scaling=1
-} 
+}
 centroids.present <- TRUE
 if(is.null(res.rda$CCA$centroids)) {
   centroids.present <- FALSE
@@ -197,7 +197,7 @@ if(is.null(res.rda$CCA$centroids)) {
     cat("No factor, hence levels cannot be plotted with symbols; 'plot.centr' is set to FALSE\n")
     plot.centr  <- FALSE
     label.centr <- FALSE
-  }  
+  }
 }
 #
 if(is.null(select.spe)){ vec <- 1:n.sp } else { vec <- select.spe }
@@ -242,11 +242,11 @@ BP.sc <- BP.sc*fact.env*mult.arrow
 ###
   # Draw the main plot
   mat <- rbind(sit.sc[,1:k], spe.sc[,1:k], BP.sc[,1:k])
-  plot(mat[,c(ax1,ax2)], type="n", main=paste("RDA triplot - Scaling", scaling, "-", 
-    site.sc), xlim=c(lim[1,ax1], lim[2,ax1]), ylim=c(lim[1,ax2], lim[2,ax2]), 
-    xlab=paste("RDA ",ax1), ylab=paste("RDA ",ax2), asp=1)
+  plot(mat[,c(ax1,ax2)], type="n", main=paste("RDA triplot - Scaling", scaling, "-",
+    site.sc), xlim=c(lim[1,ax1], lim[2,ax1]), ylim=c(lim[1,ax2], lim[2,ax2]),
+    xlab=paste("RDA ",ax1, "- Var explained :", round(eig.val.rel[ax1]*100,1), "%"), ylab=paste("RDA ",ax2, "- Var explained :", round(eig.val.rel[ax2]*100,1), "%"), asp=1)
   abline(h=0, v=0, col="grey60")
-  
+
   # Draw the site scores ("lc" or "wa")
   if(plot.sites) {
     points(sit.sc[,ax1], sit.sc[,ax2], pch=20)
