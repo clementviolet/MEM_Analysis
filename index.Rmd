@@ -188,6 +188,7 @@ triplot.rda(rda_env, site.sc = "wa", label.sites = FALSE)
 ```
 
 Bon toujours `goodness()` quoi...
+
 ## Mise en commun
 
 On va joindre les deux tableaux (MEMs et variables environnementales utilisées)
@@ -209,6 +210,12 @@ Vérification de la significativé.
 
 ```{r}
 anova.cca(rda_envspa)
+```
+
+
+```{r message = FALSE}
+triplot.rda(rda_envspa, site.sc = "wa", scaling = 1, label.sites = FALSE, plot.centr = FALSE)
+triplot.rda(rda_envspa, site.sc = "wa", label.sites = FALSE, plot.centr = FALSE)
 ```
 
 Sélection des variables.
