@@ -202,6 +202,7 @@ Vérification de la significativé.
 
 ```{r}
 anova.cca(rda_envspa)
+rda_envspa
 ```
 
 
