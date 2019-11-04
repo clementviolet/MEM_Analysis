@@ -137,18 +137,19 @@ On regarde si la RDA est significative
 
 ```{r}
 anova.cca(rda_mem)
+rda_mem
 ```
 
 Nous n'avons pas besoin de regarder s'il y a de la colinéarité avec entres les MEMs, car par définitions, ils sont tous orthogonaux les uns aux autres. 
 
-Enfin, on va regarder les graphiques.
+Enfin, on va regarder les graphiques. Ces RDA sont présentées de manière indicative.
 
 ```{r message = FALSE}
 triplot.rda(rda_mem, site.sc = "lc", scaling = 1, label.sites = FALSE)
 triplot.rda(rda_mem, site.sc = "lc", label.sites = FALSE)
 ```
 
-On va enlever les espèces les moins bien représentés dans nos ordinations. Le seuil fixé à  ` > 0.4` est arbitraire et dépend des résultats de `goodness(rda_mem)`.
+On va enlever les espèces les moins bien représentés dans nos ordinations. Le seuil fixé à  ` > 0.4` est arbitraire et dépend des résultats de `goodness(rda_mem)`. Ces RDA sont présentées de manière indicative.
 
 ```{r message = FALSE}
 triplot.rda(rda_mem, site.sc = "lc", scaling = 1, label.sites = FALSE, select.spe = goodness(rda_mem, model = "CCA")[, 2] > 0.4)
@@ -176,6 +177,7 @@ Test de notre modèle.
 
 ```{r}
 anova.cca(rda_env)
+rda_env
 ```
 
 Notre modèle est significatif. Regardons maintenant la colinéarité.
@@ -184,14 +186,14 @@ Notre modèle est significatif. Regardons maintenant la colinéarité.
 vif.cca(rda_env)
 ```
 
-Maintenant, affichons les graphiques.
+Maintenant, affichons les graphiques. Ces RDA sont présentées de manière indicative.
 
 ```{r message = FALSE}
 triplot.rda(rda_env, site.sc = "lc", scaling = 1, label.sites = FALSE)
 triplot.rda(rda_env, site.sc = "lc", label.sites = FALSE)
 ```
 
-On va retirer de l'affichage quelques espèces.
+On va retirer de l'affichage quelques espèces. Ces RDA sont présentées de manière indicative.
 
 ```{r message = FALSE}
 triplot.rda(rda_env, site.sc = "lc", scaling = 1, label.sites = FALSE, select.spe = goodness(rda_env, model = "CCA")[, 2] > 0.15)
@@ -245,3 +247,5 @@ Enfin la capacité de rétention en eau des sols est relativement indépendante 
 Si l'on regarde dans l'ensemble les résultats de la RDA, il semblerait que l'espèce E19 doit être cantonné un petit nombre de sites proches faiblement autocorrélés spatialement sauf pour un endroit bien précis. Les conditions environnementales qui font que cette espèce est abondante sont : un milieu d'altitude avec une capacité de rétention en eau assez importante. 
 La distribution de l'espèce E1 est fortement contrainte par les variables spatiales et présente une forte concentration en potassium, il est raisonnable de penser que c'est une espèce que l'on trouve sur toutes les zones proches des bras de mer.
 La distribution de l'espèce E3 quant à elle est fortement contrainte par un milieu d'altitude et l'absence de potassium. Il est raisonnable de supposer que c'est une plante que l'on retrouvera plus éloignée des bras de mer.
+
+Pour conclure notre modèle montre que notre communautés est majoritairement structurés par des variables spatiales, ici représenté par des MEMs. La communauté floristique est structurée dans une moins grande mesure par trois variables environnementales : la concentration en potassium, la capacité de rétention en eau et l'altitude.
