@@ -1,0 +1,11 @@
+###### Advanced Statistical Analysis ######
+
+Le fichier index.Rmd contient toutes les analyses faite pour ce travail. Vous pouvez lire ce fichier depuis RStudio. Pour une visualisation plus confortable, vous pouvez visualiser ce travail à l'aide du lien suivante : https://clementviolet.github.io/MEM_Analysis/
+
+Autheurs :
+- Benoit DAVIET
+- Julien LOMBARD
+- Keyvin RAYNAL
+- Olaloudé Judicaël OSSE
+- Julien ROCHE
+- Clément VIOLET
