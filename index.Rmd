@@ -1,6 +1,12 @@
 ---
-title: "MEM Analysis"
-author: "Clément"
+title: "Advanced Statistical Analysis"
+author: 
+- "Benoit DAVIET"
+- "Julien LOMBARD"
+- "Keyvin RAYNAL"
+- "Olaloudé Judicaël OSSE"
+- "Julien ROCHE"
+- "Clément VIOLET"
 date: "29/10/2019"
 output: rmdformats::readthedown
 ---
