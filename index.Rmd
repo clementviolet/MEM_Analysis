@@ -9,6 +9,8 @@ output: rmdformats::readthedown
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+Pour lire ce document plus confortablement, vous pouvez cliquer sur [ce lien](https://clementviolet.github.io/MEM_Analysis/).
+
 ## Introduction
 
 La question biologique à laquelle on doit répondre est la suivante : 
@@ -35,6 +37,10 @@ Le plan d'analyse est le suivant :
 4. Mise en commun :
     - Faire une RDA des données floristiques avec les MEMs et les variables environnementales sélectionnées.
     - Interpréter les résultats
+    
+Le choix de l'analyse canonique s'est imposé à nous, car nous souhaitons expliquer un tableau de données floristiques par un autre tableau contenant des variables environnementales et certains Moran Eigenvector Map. Nous avons transformé les données du tableau de données floristiques par la transformation de Hellinger. Cette transformation permet une meilleure représentation des communautés lorsque l'on utilise des méthodes d'ordination (Legendre & Gallagher 2001). Nous avons également choisi d'utiliser comme méthode d'ordination la RDA puisque la méthode de la CCA a comme désavantage d'utiliser la distance du Khi-2 qui donne plus de poids aux différences d'abondances d'espèces rares. La distance du Khi-2 est décriée par certains auteurs comme étant la pire distance à utiliser en écologie (Faith et al. 1987), au contraire de la distance de Hellinger.
+
+Pour prendre en compte la proximité spatiale des sites, nous avons choisi d'utiliser des vecteurs propres de Moran comme variables environnementales. Les vecteurs propres de ces matrices maximisent l'index de Moran pour prendre en compte l'autocorrélation spatiale.
 
 ## Chargement des packages, données et mise en forme des données
 
@@ -63,8 +69,13 @@ str(flo)
 
 str(mil)
 
+summary(flo)
 summary(mil)
+
+plot(coord$x, coord$y)
 ```
+
+Le graphique montre que le plan d'échantillonnage n'est pas régulier.
 
 Centrage & réduction des données environnementales et transformation des données floristiques.
 
@@ -98,14 +109,14 @@ MC_env <- moran.randtest(mil, listwgab, nrepet = 999)
 plot(MC_env)
 ```
 
-Seul le sable ne présente pas d'autocorrélation spatiale. On va sélectionner quelles sont les MEM à conserver pour éviter le surapprentissage. Attention, seul les MEM ayant une autocorrelation positive sont détectés ici.
+Seul le sable ne présente pas d'autocorrélation spatiale. On va sélectionner quelles sont les MEM à conserver pour éviter le surapprentissage. Attention, seul les MEM ayant une autocorrelation positive sont détectés ici, ce qui peut être un incovénient.
 
 ```{r mem-sel}
 pca_hell <- dudi.pca(flo_hell, scale = FALSE, scannf = FALSE, nf = 2)
 mem_gab_sel <- mem.select(pca_hell$tab, listw = listwgab)
 ```
 
-Maintenant, affichons le partitionnement de la variance
+Maintenant, regardons le partitionnement de la variance.
 
 ```{r}
 
@@ -114,7 +125,9 @@ print(vp)
 plot(vp, bg = c(3, 5), Xnames = c("env", "spa")) 
 ```
 
-L'environnement seul représente 0.01% de la variance de l'ACP, le spatial 20%, le chevauchement des deux 12%. Maintenant, faisons une RDA avec les MEMs sélectionnées.
+L'environnement seul représente 0.01% de la variance de l'ACP, le spatial 20%, le chevauchement des deux 12%. 
+
+Maintenant, faisons une RDA avec les MEMs sélectionnées.
 
 ```{r}
 rda_mem <- rda(flo_hell ~ ., mem_gab_sel$MEM.select)
@@ -126,6 +139,8 @@ On regarde si la RDA est significative
 anova.cca(rda_mem)
 ```
 
+Nous n'avons pas besoin de regarder s'il y a de la colinéarité avec entres les MEMs, car par définitions, ils sont tous orthogonaux les uns aux autres. 
+
 Enfin, on va regarder les graphiques.
 
 ```{r message = FALSE}
@@ -134,6 +149,7 @@ triplot.rda(rda_mem, site.sc = "lc", label.sites = FALSE)
 ```
 
 On va enlever les espèces les moins bien représentés dans nos ordinations. Le seuil fixé à  ` > 0.4` est arbitraire et dépend des résultats de `goodness(rda_mem)`.
+
 ```{r message = FALSE}
 triplot.rda(rda_mem, site.sc = "lc", scaling = 1, label.sites = FALSE, select.spe = goodness(rda_mem, model = "CCA")[, 2] > 0.4)
 triplot.rda(rda_mem, site.sc = "lc", label.sites = FALSE, select.spe = goodness(rda_mem, model = "CCA")[, 2] > 0.4)
@@ -141,7 +157,7 @@ triplot.rda(rda_mem, site.sc = "lc", label.sites = FALSE, select.spe = goodness(
 
 ## Partie environnemtale
 
-On séléectionne les variable qui maximise le $R^2$.
+On séléectionne les variable qui maximise le $R^2_{adj}$.
 
 ```{r}
 m0 <- rda(flo ~ 1, mil_scl)
@@ -149,7 +165,8 @@ m1 <- rda(flo ~ ., mil_scl)
 
 ordiR2step(m0, m1)
 ```
-Maintenant on va faire le modèle
+
+Le modèle qui maxime le $R^2_{adj}$ est : $\text{flo} \sim \text{k} + \text{altitude} + \text{capa_reten}$. Maintenant on va faire le modèle.
  
 ```{r}
 rda_env <- rda(flo_hell ~ k + altitude + capa_reten, mil_scl)
@@ -161,13 +178,13 @@ Test de notre modèle.
 anova.cca(rda_env)
 ```
 
-Super, c'est significatif ! Regardons maintenant la colinéarité.
+Notre modèle est significatif. Regardons maintenant la colinéarité.
 
 ```{r}
 vif.cca(rda_env)
 ```
 
-Youpi ! Maintenant, les graphiques.
+Maintenant, affichons les graphiques.
 
 ```{r message = FALSE}
 triplot.rda(rda_env, site.sc = "lc", scaling = 1, label.sites = FALSE)
@@ -191,7 +208,6 @@ env_spa <- mil_scl %>%
   cbind(mem_gab_sel$MEM.select)
 ```
 
-
 La RDA.
 
 ```{r}
@@ -205,6 +221,7 @@ anova.cca(rda_envspa)
 rda_envspa
 ```
 
+Notre modèle est significatif.
 
 ```{r message = FALSE}
 triplot.rda(rda_envspa, site.sc = "lc", scaling = 1, label.sites = FALSE, plot.centr = FALSE)
@@ -218,3 +235,13 @@ triplot.rda(rda_envspa, site.sc = "lc", scaling = 1, label.sites = FALSE, select
 
 triplot.rda(rda_envspa, site.sc = "lc", label.sites = FALSE, select.spe = goodness(rda_envspa, model = "CCA")[, 2] > 0.3)
 ```
+
+Notre modèle comprenant les variables environnementales et les MEMs permet d'expliquer près de $46 \%$ de la variance totale de notre jeu de donnée. Le premier axe conserve $18\%$ de la variance et le second $6,9\%$. Le triplot en scaling de type I montre que nous avons deux grands groupes de sites : ceux à gauche de l'ordination et ceux à droite. Ceux à gauche sont plutôt corrélés négativement avec les variables MEMs tandis que ceux qui sont à droite sont corrélés plus fortement avec ls variables MEMs. Le scaling de type II montre que la plupart des espèces les mieux représentées dans notre ordination ont plutôt tendance à corréler négativement ou indépendantes des MEMs. Cette interprétation n'est pas valable pour l'espèce E19 qui est très fortement corrélée avec la variable MEM4 et l'espèce E1 qui est fortement corrélée avec quasiment toutes les autres variables MEM. 
+
+Si nous nous intéressons maintenant aux autres variables environnementales, il est possible d'observer que la majorité des espèces les mieux représentées dans notre ordination sont des espèces qui vivent dans des sites où la capacité de rétention en eau est faible. L'espèce E1  est une espèce très fortement corrélée à la concentration en potassium, c'est donc une espèce plutôt halophile. Au contraire, l'espèce E13 est négativement corrélée avec la présence de potassium, c'est donc une espèce halophobe. Enfin le groupe d'espèce en bas à gauche de l'ordination (E41, E43, E44, E47, etc.) sont corrélés avec positivement avec l'altitude, mais négativement avec la capacité de rétention en eau. Ce sont des espèces que l'on va retrouver plutôt à l'arrière du front de mer sur un sol sec.
+
+Enfin la capacité de rétention en eau des sols est relativement indépendante de la concentration en potassium et de l'altitude. Nous supposons que cet effet est dû à la composition différente des sols qui ferait que par exemple, certains sols plus hauts en altitude contiennent plus d'eau que d'autres plus bas.
+
+Si l'on regarde dans l'ensemble les résultats de la RDA, il semblerait que l'espèce E19 doit être cantonné un petit nombre de sites proches faiblement autocorrélés spatialement sauf pour un endroit bien précis. Les conditions environnementales qui font que cette espèce est abondante sont : un milieu d'altitude avec une capacité de rétention en eau assez importante. 
+La distribution de l'espèce E1 est fortement contrainte par les variables spatiales et présente une forte concentration en potassium, il est raisonnable de penser que c'est une espèce que l'on trouve sur toutes les zones proches des bras de mer.
+La distribution de l'espèce E3 quant à elle est fortement contrainte par un milieu d'altitude et l'absence de potassium. Il est raisonnable de supposer que c'est une plante que l'on retrouvera plus éloignée des bras de mer.
